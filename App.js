@@ -2,12 +2,12 @@
 // but for lists of unknown or changing length, FlatList is better for performance.
 
 import { useState } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Button } from 'react-native';
 import ToDoItem from './components/ToDoItem';
 import UserInput from './components/UserInput';
 
 export default function App() {
-  
+  const [modalIsVisible, setModalIsVisible] = useState(false);
   const [listOfToDo, setListOfToDo] = useState([]); // State to store the list of goals (array of strings)
 
   //Handle Events
@@ -22,20 +22,37 @@ export default function App() {
         {text: userEnteredGoal, id: Math.random().toString() } //newly add To Do items and id 
       ]
     );
+
+    endAddGoal();
   };
+
+  function startAddGoalModal() {
+    setModalIsVisible(true);
+  };
+
+  function endAddGoal() {
+    setModalIsVisible(false);
+  }
 
   function deleteToDoItem(id) {
     setListOfToDo(currentToDo => {
       return currentToDo.filter((goal) => goal.id !== id);
     });
+    endAddGoal();
   };
 
   return (
     // Main container view
     <View style={styles.appcontainer}>
-
+      <View style={styles.button}>
+        <Button
+          title='Add Task'
+          color='black'
+          onPress={startAddGoalModal}
+        />
+      </View> 
       {/* Input section for typing and adding a goal */}
-      <UserInput addGoalButton={AddGoalButton} />
+      <UserInput visible={modalIsVisible} addGoalButton={AddGoalButton} onCancel={endAddGoal}/>
 
       {/* Display the list of added goals */}
       <View style={styles.goalList}>
@@ -48,6 +65,7 @@ export default function App() {
             return (
               <ToDoItem
                 text={task.item.text}
+                id={task.item.id}
                 onDeleteItem={deleteToDoItem} />
             );
           }}
@@ -67,6 +85,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
     paddingHorizontal: 16,
+    flexDirection: "column-reverse",
+    paddingBottom: 20
   }, 
 
   goalList: {
@@ -77,5 +97,14 @@ const styles = StyleSheet.create({
     fontSize: 25,
     padding: 8,
     fontWeight: 'bold'
+  },
+
+  button: {
+    borderColor: '#ADD8E6',
+    backgroundColor: '#ADD8E6',
+    borderRadius: 8,
+    margin: 10,
+    width: '95%',
+    justifyContent:'center'
   },
 });
